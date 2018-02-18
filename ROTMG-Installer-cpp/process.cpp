@@ -36,7 +36,7 @@ Process Process::GetProcessByName(const std::wstring filename)
 		if (_wcsicmp(pEntry.szExeFile, filename.c_str()) == 0)
 		{
 			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
-				(DWORD)pEntry.th32ProcessID);
+				static_cast<DWORD>(pEntry.th32ProcessID));
 			if (hProcess != NULL)
 			{
 				Process proc(pEntry.szExeFile, pEntry.th32ProcessID, hProcess);
@@ -64,7 +64,7 @@ std::vector<Process> Process::GetProcesses()
 	while (hRes)
 	{
 		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
-			(DWORD)pEntry.th32ProcessID);
+			static_cast<DWORD>(pEntry.th32ProcessID));
 		if (hProcess != NULL)
 		{
 			Process proc(pEntry.szExeFile, pEntry.th32ProcessID, hProcess);

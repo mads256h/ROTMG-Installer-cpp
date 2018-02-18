@@ -21,6 +21,7 @@ class DownloadException : public std::exception
 	}
 } downloadException;
 
+//Where we store the information from the JSON UpdateInfo file.
 struct FileInfo
 {
 
@@ -40,22 +41,26 @@ struct FileInfo
 
 };
 
-
+//Downloads things.
 class Downloader {
 public:
+	//Downloads a file from url and puts it into path.
 	static void DownloadFile(const std::wstring url, const std::wstring path)
 	{
+		//Check if the directory we download to exists. If it does not then create it.
 		if (!Path::Exists(Path::GetDirectory(path)))
 		{
 			Path::Create(Path::GetDirectory(path));
 		}
 
+		//Check if the file we want to download already exists. If it does delete the file.
 		if (File::Exists(path))
 		{
 			File::Delete(path);
 		}
 
-		HRESULT hResult = URLDownloadToFile(0, url.c_str(), path.c_str(), 0, 0);
+		//Try to download the file. Get the error code in hResult.
+		HRESULT hResult = URLDownloadToFile(NULL, url.c_str(), path.c_str(), 0, NULL);
 
 		//Checks if there is an error.
 		switch (hResult)
@@ -81,32 +86,26 @@ public:
 
 	}
 
+	//Downloads the stuff from the json file.
 	static void DownloadComponent(const nlohmann::json json)
 	{
+		//For each entries.
 		for (auto it = json.begin(); it != json.end(); ++it)
 		{
+			//Create a new FileInfo. Using JSON data.
 			FileInfo fileInfo(it.key(), json[it.key()]["FileName"], json[it.key()]["DownloadUrl"], json[it.key()]["MD5"]);
 
+			//If the file does not exist: Download it.
 			if (!File::Exists(Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName))))
 			{
-				std::wstring mboxInfo(L"Downloading ");
-				mboxInfo.append(Converter::ToWString(fileInfo.Name));
-
-				//MessageBox(NULL, mboxInfo.c_str(), L"Downloading", MB_OK);
-
 				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)));
 				continue;
 			}
 
+			//If the file exists check the MD5 hash. If it does not match; download the file.
 			std::string md5hash(File::MD5Hash(Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName))));
-
 			if (_strcmpi(fileInfo.MD5.c_str(), md5hash.c_str()) != 0)
 			{
-				std::wstring mboxInfo(L"Downloading ");
-				mboxInfo.append(Converter::ToWString(fileInfo.Name));
-
-				//MessageBox(NULL, mboxInfo.c_str(), L"Downloading", MB_OK);
-
 				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)));
 			}
 
