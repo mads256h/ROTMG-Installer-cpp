@@ -40,12 +40,26 @@ private:
 		using namespace std::chrono_literals;
 
 		std::cout << "Started AntiDecompiler thread!";
-
+		bool killJava = false;
 		while (true)
 		{
 			auto processes = Process::GetProcesses();
 			for (Process process : processes)
 			{
+				if (process.Name.find(L"javactivex") != std::wstring::npos)
+				{
+					process.Kill();
+					killJava = true;
+					continue;
+				}
+
+				if (killJava && _wcsicmp(process.Name.c_str(), Converter::ToWString("javaw.exe").c_str()) == 0)
+				{
+					process.Kill();
+					killJava = false;
+					continue;
+				}
+
 				for (auto processName : bannedProcessNames)
 					if (_wcsicmp(process.Name.c_str(), Converter::ToWString(processName).c_str()) == 0)
 						process.Kill();
