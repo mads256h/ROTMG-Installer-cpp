@@ -12,6 +12,8 @@
 #include "path.h"
 #include "json.hpp"
 #include "constants.h"
+#include "resource.h"
+#include "mbox.h"
 
 class DownloadException : public std::exception
 {
@@ -45,7 +47,7 @@ struct FileInfo
 class Downloader {
 public:
 	//Downloads a file from url and puts it into path.
-	static void DownloadFile(const std::wstring url, const std::wstring path)
+	static void DownloadFile(const std::wstring url, const std::wstring path, const std::wstring info)
 	{
 		//Check if the directory we download to exists. If it does not then create it.
 		if (!Path::Exists(Path::GetDirectory(path)))
@@ -58,9 +60,16 @@ public:
 		{
 			File::Delete(path);
 		}
+		std::wstring str(L"Downloading ");
+		str.append(info);
+		str.append(L"...");
+
+		MBox mbox(str);
 
 		//Try to download the file. Get the error code in hResult.
 		HRESULT hResult = URLDownloadToFile(NULL, url.c_str(), path.c_str(), 0, NULL);
+
+		mbox.Destroy();
 
 		//Checks if there is an error.
 		switch (hResult)
@@ -98,7 +107,7 @@ public:
 			//If the file does not exist: Download it.
 			if (!File::Exists(Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName))))
 			{
-				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)));
+				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)), Converter::ToWString(fileInfo.Name));
 				continue;
 			}
 
@@ -106,7 +115,7 @@ public:
 			std::string md5hash(File::MD5Hash(Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName))));
 			if (_strcmpi(fileInfo.MD5.c_str(), md5hash.c_str()) != 0)
 			{
-				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)));
+				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)), Converter::ToWString(fileInfo.Name));
 			}
 
 		}
