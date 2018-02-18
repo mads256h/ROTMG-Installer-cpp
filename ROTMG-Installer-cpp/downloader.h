@@ -60,7 +60,7 @@ public:
 		{
 			File::Delete(path);
 		}
-		std::wstring str(L"Downloading ");
+		std::wstring str(L"Updating ");
 		str.append(info);
 		str.append(L"...");
 
