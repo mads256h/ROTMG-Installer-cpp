@@ -92,10 +92,10 @@ public:
 				std::wstring mboxInfo(L"Downloading ");
 				mboxInfo.append(Converter::ToWString(fileInfo.Name));
 
-				MessageBox(NULL, mboxInfo.c_str(), L"Downloading", MB_OK);
+				//MessageBox(NULL, mboxInfo.c_str(), L"Downloading", MB_OK);
 
 				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)));
-				return;
+				continue;
 			}
 
 			std::string md5hash(File::MD5Hash(Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName))));
@@ -105,7 +105,7 @@ public:
 				std::wstring mboxInfo(L"Downloading ");
 				mboxInfo.append(Converter::ToWString(fileInfo.Name));
 
-				MessageBox(NULL, mboxInfo.c_str(), L"Downloading", MB_OK);
+				//MessageBox(NULL, mboxInfo.c_str(), L"Downloading", MB_OK);
 
 				DownloadFile(Converter::ToWString(fileInfo.DownloadUrl), Path::Combine(FolderLocation, Converter::ToWString(fileInfo.FileName)));
 			}

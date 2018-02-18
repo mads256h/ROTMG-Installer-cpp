@@ -54,6 +54,9 @@
     <ClInclude Include="downloader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="moviedeleter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

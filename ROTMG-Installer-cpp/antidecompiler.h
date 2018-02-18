@@ -65,14 +65,6 @@ private:
 						process.Kill();
 			}
 
-#ifndef _DEBUG
-			if (IsDebuggerPresent() == TRUE)
-			{
-				MessageBox(NULL, L"A URL context could not be created!", L"WINAPI Error", MB_OK);
-				exit(1);
-			}
-#endif _DEBUG
-
 			std::this_thread::sleep_for(0.5s);
 		}
 	}
