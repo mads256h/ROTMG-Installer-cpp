@@ -14,7 +14,7 @@
 
 #include "converter.h"
 
-
+//The interface for Process.
 class Process
 {
 public:
@@ -23,7 +23,6 @@ public:
 	static Process Run(std::wstring path);
 	static BOOL IsMainWindow(HWND handle);
 
-	Process(std::wstring name, DWORD id, HANDLE handle);
 	std::wstring Name;
 	DWORD Id;
 	HANDLE Handle;
@@ -35,6 +34,10 @@ public:
 	void SetIcon(HICON hIcon) const;
 	void SetTitle(std::wstring title) const;
 	void DisableResizing() const;
+
+private:
+	Process(std::wstring name, DWORD id, HANDLE handle);
+
 };
 
 #endif // PROCESS_H

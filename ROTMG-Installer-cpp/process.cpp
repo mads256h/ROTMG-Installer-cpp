@@ -21,7 +21,8 @@ struct HandleData {
 	HWND bestHandle;
 };
 
-Process Process::GetProcessByName(const std::wstring filename)
+//Gets a Process object by name
+Process Process::GetProcessByName(const std::wstring processName)
 {
 	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
 	PROCESSENTRY32 pEntry;
@@ -29,11 +30,8 @@ Process Process::GetProcessByName(const std::wstring filename)
 	BOOL hRes = Process32First(hSnapShot, &pEntry);
 	while (hRes)
 	{
-		//std::wcout << pEntry.szExeFile << L" ";
-
-		//std::wcout << filename << "\r\n";
-
-		if (_wcsicmp(pEntry.szExeFile, filename.c_str()) == 0)
+		//If the process name and the current looped process match return it.
+		if (_wcsicmp(pEntry.szExeFile, processName.c_str()) == 0)
 		{
 			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
 				static_cast<DWORD>(pEntry.th32ProcessID));
@@ -47,12 +45,16 @@ Process Process::GetProcessByName(const std::wstring filename)
 		hRes = Process32Next(hSnapShot, &pEntry);
 	}
 	CloseHandle(hSnapShot);
+
+	//We could not find it return this.
+	//TODO: Throw an exception instead.
 	Process proc(L"", 0, NULL);
 
 	return proc;
 
 }
 
+//Gets a list of all running processes.
 std::vector<Process> Process::GetProcesses()
 {
 	std::vector<Process> processes;
@@ -61,6 +63,7 @@ std::vector<Process> Process::GetProcesses()
 	PROCESSENTRY32 pEntry;
 	pEntry.dwSize = sizeof(pEntry);
 	BOOL hRes = Process32First(hSnapShot, &pEntry);
+	//Loop through all processes and add it to the list.
 	while (hRes)
 	{
 		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
@@ -74,10 +77,11 @@ std::vector<Process> Process::GetProcesses()
 	}
 	CloseHandle(hSnapShot);
 
+	//Return the list.
 	return processes;
 }
 
-
+//Runs a executable.
 Process Process::Run(std::wstring path)
 {
 	STARTUPINFO startupInfo;
@@ -104,13 +108,13 @@ Process Process::Run(std::wstring path)
 	{
 		throw processCouldNotStartException;
 	}
-
+	//Get the process we just started and return it.
 	Process process(path, processInfo.dwProcessId, processInfo.hProcess);
 
 	return process;
 }
 
-
+//Creates a new instance of Process. This should never be used directly.
 Process::Process(const std::wstring name, DWORD id, HANDLE handle)
 {
 	Name = name;
@@ -118,6 +122,7 @@ Process::Process(const std::wstring name, DWORD id, HANDLE handle)
 	Handle = handle;
 }
 
+//Kills the process.
 bool Process::Kill()
 {
 	if (Handle != NULL)
@@ -135,6 +140,7 @@ bool Process::Kill()
 	return false;
 }
 
+//Used to get the main window handle.
 BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
 {
 	HandleData& data = *reinterpret_cast<HandleData*>(lParam);
@@ -148,6 +154,7 @@ BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
 	return FALSE;
 }
 
+//Gets the process's main window handle.
 HWND Process::GetMainWindow() const
 {
 	HandleData data;
@@ -157,6 +164,7 @@ HWND Process::GetMainWindow() const
 	return data.bestHandle;
 }
 
+//Waits until the program exists.
 void Process::WaitForExit() const
 {
 	DWORD exitcode;
@@ -171,7 +179,7 @@ void Process::WaitForExit() const
 	}
 }
 
-
+//Waits until the main window is created.
 void Process::WaitForMainWindow() const
 {
 	while (GetMainWindow() == static_cast<HWND>(0))
@@ -182,7 +190,7 @@ void Process::WaitForMainWindow() const
 	}
 }
 
-
+//Sets the main windows icon.
 void Process::SetIcon(HICON hIcon) const
 {
 	HWND mainWindow = GetMainWindow();
@@ -195,6 +203,7 @@ void Process::SetIcon(HICON hIcon) const
 	SendMessage(mainWindow, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 }
 
+//Sets the main windows title.
 void Process::SetTitle(const std::wstring title) const
 {
 	HWND mainWindow = GetMainWindow();
@@ -206,6 +215,7 @@ void Process::SetTitle(const std::wstring title) const
 	SetWindowText(mainWindow, title.c_str());
 }
 
+//Disable resizing main window.
 void Process::DisableResizing() const
 {
 	HWND mainWindow = GetMainWindow();
@@ -221,9 +231,7 @@ void Process::DisableResizing() const
 
 }
 
-
-
-
+//Checks if the handle is the main window.
 BOOL Process::IsMainWindow(HWND handle)
 {
 	return GetWindow(handle, GW_OWNER) == static_cast<HWND>(0) && IsWindowVisible(handle);
