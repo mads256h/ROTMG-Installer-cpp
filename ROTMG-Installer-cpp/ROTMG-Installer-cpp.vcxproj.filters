@@ -51,6 +51,9 @@
     <ClInclude Include="process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="downloader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -58,9 +61,6 @@
     </ClCompile>
     <ClCompile Include="ROTMG-Installer-cpp.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="md5.cpp">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="process.cpp">
       <Filter>Header Files</Filter>

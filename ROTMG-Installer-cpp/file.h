@@ -54,8 +54,8 @@ public:
 
 	static bool Exists(const std::wstring fileName)
 	{
-
-		if (FILE *file = fopen(Converter::ToString(fileName).c_str(), "r"))
+		FILE *file;
+		if (fopen_s(&file, Converter::ToString(fileName).c_str(), "r") == 0)
 		{
 			fclose(file);
 			return true;
@@ -85,7 +85,12 @@ public:
 
 	static std::string MD5Hash(const std::wstring fileName)
 	{
-		return md5(Read(fileName));
+		if (!Exists(fileName))
+			throw fileNotFoundException;
+		MD5 md5;
+		std::string md5hash(md5.digestFile(Converter::ToString(fileName).c_str()));
+		
+		return md5hash;
 	}
 
 private:

@@ -99,8 +99,9 @@ public:
 
 	static std::wstring GetDirectory(const std::wstring path)
 	{
-		WCHAR* fileName = PathFindFileName(path.c_str());
-		PathRemoveExtension(fileName);
+		WCHAR fileName[MAX_PATH];
+		wcscpy(fileName, path.c_str());
+		PathRemoveFileSpec(fileName);
 
 		std::wstring retString(fileName);
 		return retString;

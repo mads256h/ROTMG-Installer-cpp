@@ -8,6 +8,14 @@ class ProcessCouldNotStartException : public std::exception
 	}
 } processCouldNotStartException;
 
+class NoMainWindowHandleException : public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "The process does not have a main window";
+	}
+} noMainWindowHandleException;
+
 struct HandleData {
 	DWORD processId;
 	HWND bestHandle;
@@ -144,13 +152,68 @@ HWND Process::GetMainWindow() const
 	return data.bestHandle;
 }
 
+void Process::WaitForExit() const
+{
+	DWORD exitcode;
+	GetExitCodeProcess(Handle, &exitcode);
+	while (exitcode == STILL_ACTIVE)
+	{
+		using namespace std::chrono_literals;
+
+		std::this_thread::sleep_for(1s);
+
+		GetExitCodeProcess(Handle, &exitcode);
+	}
+}
+
 
 void Process::WaitForMainWindow() const
 {
 	while (GetMainWindow() == static_cast<HWND>(0))
 	{
-		std::cout << "Waiting!" << std::endl;
+		using namespace std::chrono_literals;
+
+		std::this_thread::sleep_for(0.2s);
 	}
+}
+
+
+void Process::SetIcon(HICON hIcon) const
+{
+	HWND mainWindow = GetMainWindow();
+	if (mainWindow == static_cast<HWND>(0))
+	{
+		throw noMainWindowHandleException;
+	}
+	
+	SendMessage(mainWindow, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+	SendMessage(mainWindow, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+}
+
+void Process::SetTitle(const std::wstring title) const
+{
+	HWND mainWindow = GetMainWindow();
+	if (mainWindow == static_cast<HWND>(0))
+	{
+		throw noMainWindowHandleException;
+	}
+
+	SetWindowText(mainWindow, title.c_str());
+}
+
+void Process::DisableResizing() const
+{
+	HWND mainWindow = GetMainWindow();
+	if (mainWindow == static_cast<HWND>(0))
+	{
+		throw noMainWindowHandleException;
+	}
+
+	HMENU hSysmenu = GetSystemMenu(mainWindow, FALSE);
+
+	DeleteMenu(hSysmenu, SC_MAXIMIZE, MF_BYCOMMAND);
+	DeleteMenu(hSysmenu, SC_SIZE, MF_BYCOMMAND);
+
 }
 
 
