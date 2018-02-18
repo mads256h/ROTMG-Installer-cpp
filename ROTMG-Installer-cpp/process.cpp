@@ -124,6 +124,11 @@ bool Process::Kill()
 	{
 		TerminateProcess(Handle, 9);
 		CloseHandle(Handle);
+		
+		Name = L"";
+		Id = 0;
+		Handle = NULL;
+
 		return true;
 	}
 

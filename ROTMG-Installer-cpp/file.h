@@ -26,22 +26,25 @@ class FileException : public std::exception
 	}
 } fileException;
 
+
+//A static class for use with files.
 class File {
 public:
 
-	static void Delete(const std::wstring fileName, const bool ignoreError = false)
+	//Deletes the file specified by path.
+	static void Delete(const std::wstring path, const bool ignoreError = false)
 	{
-		if (Exists(fileName))
+		//Check if the file exists. If it does not and ignoreError is false. Throw a fileNotFoundException.
+		if (Exists(path))
 		{
-			//If noError is not 0. It failed to delete the file.
-			auto noError = DeleteFile(fileName.c_str());
-
-			if (noError == 0 && !ignoreError)
+			//If we cannot delete the file and ignoreError is false. Throw a fileException.
+			if (DeleteFile(path.c_str()) == FALSE && !ignoreError)
 			{
 				throw fileException;
 			}
 
-			if (Exists(fileName))
+			//If the file still exists after deletion. Throw a fileException.
+			if (Exists(path))
 			{
 				throw fileException;
 			}
@@ -52,10 +55,12 @@ public:
 		}
 	}
 
-	static bool Exists(const std::wstring fileName)
+	//Check if path is a file and it exists.
+	static bool Exists(const std::wstring path)
 	{
+		//Opens the file. If it is successful it closes the file again.
 		FILE *file;
-		if (fopen_s(&file, Converter::ToString(fileName).c_str(), "r") == 0)
+		if (fopen_s(&file, Converter::ToString(path).c_str(), "r") == 0)
 		{
 			fclose(file);
 			return true;
@@ -66,29 +71,34 @@ public:
 		}
 	}
 
-
-	static std::string Read(const std::wstring fileName)
+	//Read the file in path.
+	static std::string Read(const std::wstring path)
 	{
-		if (Exists(fileName))
+		//If the file does not exist. Throw a fileNotFoundException.
+		if (Exists(path))
 		{
 			//The file stream
-			std::ifstream ifstream(fileName);
+			std::ifstream ifstream(path);
 
 			//Creates a new string based on the contents in the file stream.
-			std::string string((std::istreambuf_iterator<char>(ifstream)), std::istreambuf_iterator<char>());
+			std::string retString((std::istreambuf_iterator<char>(ifstream)), std::istreambuf_iterator<char>());
 
-			return string;
+			return retString;
 		}
 		throw fileNotFoundException;
 
 	}
 
-	static std::string MD5Hash(const std::wstring fileName)
+	//Get the MD5 from a file.
+	static std::string MD5Hash(const std::wstring path)
 	{
-		if (!Exists(fileName))
+		//If the does not exist. Throw a fileNotFoundException.
+		if (!Exists(path))
 			throw fileNotFoundException;
+
+
 		MD5 md5;
-		std::string md5hash(md5.digestFile(Converter::ToString(fileName).c_str()));
+		std::string md5hash(md5.digestFile(Converter::ToString(path).c_str()));
 		
 		return md5hash;
 	}
