@@ -125,7 +125,7 @@ public:
 
 
 private:
-	Path() {}
+	Path() = delete;
 };
 
 #endif // PATH_H

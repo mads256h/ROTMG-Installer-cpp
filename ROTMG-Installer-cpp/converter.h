@@ -23,7 +23,7 @@ public:
 	}
 
 private:
-	Converter() = default;
+	Converter() = delete;
 };
 
 #endif // CONVERTER_H

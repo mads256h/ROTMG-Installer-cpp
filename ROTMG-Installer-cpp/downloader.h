@@ -122,7 +122,7 @@ public:
 	}
 
 private:
-	Downloader() {}
+	Downloader() = delete;
 };
 
 #endif // DOWNLOADER_H

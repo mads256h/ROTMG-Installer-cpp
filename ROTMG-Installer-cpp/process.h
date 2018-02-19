@@ -37,8 +37,6 @@ public:
 
 private:
 	Process(const std::wstring& name, DWORD id);
-	
-
 };
 
 #endif // PROCESS_H

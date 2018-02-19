@@ -23,7 +23,7 @@ public:
 
 
 private:
-	AntiDecompiler() = default;
+	AntiDecompiler() = delete;
 
 	//The function that is ran inside the thread.
 	static void start()

@@ -104,7 +104,7 @@ public:
 	}
 
 private:
-	File() {}
+	File() = delete;
 };
 
 #endif // FILE_H

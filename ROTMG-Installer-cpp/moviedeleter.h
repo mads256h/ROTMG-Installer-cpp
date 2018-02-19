@@ -32,5 +32,5 @@ public:
 	}
 
 private:
-	MovieDeleter() = default;
+	MovieDeleter() = delete;
 };
