@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <atomic>
+#include <thread>
 
 #include <Windows.h>
 
@@ -8,30 +10,48 @@
 #include <winuser.h>
 
 
+static std::atomic<bool> shouldDestroy = false;
+
 class MBox
 {
 public:
 
-	MBox(const std::wstring& text)
+	static void Create(const std::wstring& text)
 	{
-		dialog = CreateDialog(NULL, MAKEINTRESOURCE(IDD_DIALOG_DOWNLOAD), NULL, NULL);
+		std::thread t(run, text);
+		t.detach();
+	}
+
+	static void Destroy()
+	{
+		shouldDestroy = true;
+	}
+
+	MBox() = delete;
+
+private:
+	static void run(const std::wstring& text)
+	{
+		HWND dialog = CreateDialog(NULL, MAKEINTRESOURCE(IDD_DIALOG_DOWNLOAD), NULL, NULL);
 		ShowWindow(dialog, SW_SHOW);
 
 		SetDlgItemText(dialog, IDC_STATIC_STATUS, text.c_str());
-	}
 
-	void Destroy()
-	{
-		ShowWindow(dialog, SW_HIDE);
-		DestroyWindow(dialog);
-		dialog = NULL;
-	}
+		MSG msg;
 
-	void SetText(const std::wstring& text) const
-	{
-		SetDlgItemText(dialog, IDC_STATIC_STATUS, text.c_str());
-	}
+		while (GetMessage(&msg, NULL, 0, 0) != 0)
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 
-private:
-	HWND dialog = NULL;
+			if (shouldDestroy)
+			{
+				ShowWindow(dialog, SW_HIDE);
+				DestroyWindow(dialog);
+				dialog = NULL;
+				return;
+			}
+
+		}
+	}
 };

@@ -165,6 +165,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="ROTMG-Installer-cpp.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="steps.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>

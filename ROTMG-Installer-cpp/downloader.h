@@ -64,12 +64,12 @@ public:
 		str.append(info);
 		str.append(L"...");
 
-		MBox mbox(str);
+		MBox::Create(str);
 
 		//Try to download the file. Get the error code in hResult.
 		HRESULT hResult = URLDownloadToFile(NULL, url.c_str(), path.c_str(), 0, NULL);
 
-		mbox.Destroy();
+		MBox::Destroy();
 
 		//Checks if there is an error.
 		switch (hResult)
