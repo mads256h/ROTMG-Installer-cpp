@@ -122,6 +122,13 @@ Process::Process(const std::wstring name, DWORD id, HANDLE handle)
 	Handle = handle;
 }
 
+Process::~Process()
+{
+	if (Handle != NULL)
+	CloseHandle(Handle);
+}
+
+
 //Kills the process.
 bool Process::Kill()
 {

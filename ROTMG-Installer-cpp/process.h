@@ -34,9 +34,12 @@ public:
 	void SetIcon(HICON hIcon) const;
 	void SetTitle(std::wstring title) const;
 	void DisableResizing() const;
+	
+	~Process();
 
 private:
 	Process(std::wstring name, DWORD id, HANDLE handle);
+	
 
 };
 

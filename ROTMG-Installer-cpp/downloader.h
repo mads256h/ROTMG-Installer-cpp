@@ -17,7 +17,7 @@
 
 class DownloadException : public std::exception
 {
-	virtual const char* what() const throw()
+	const char* what() const throw() override
 	{
 		return "There was an error while downloading!";
 	}
@@ -27,7 +27,7 @@ class DownloadException : public std::exception
 struct FileInfo
 {
 
-	FileInfo(std::string name, std::string fileName, std::string downloadUrl, std::string md5)
+	FileInfo(const std::string name, const std::string fileName, const std::string downloadUrl, const std::string md5)
 	{
 		Name = name;
 		FileName = fileName;
