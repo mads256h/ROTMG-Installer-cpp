@@ -84,5 +84,8 @@
     <Image Include="ROTMG-Installer-cpp.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

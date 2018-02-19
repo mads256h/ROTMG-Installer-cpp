@@ -62,7 +62,7 @@ private:
 				}
 
 				//If killJava is true and we have the javaw.exe executable. Kill it and set killJava to false.
-				if (killJava && _wcsicmp(process.Name.c_str(), Converter::ToWString("javaw.exe").c_str()) == 0)
+				if (killJava && _wcsicmp(process.Name.c_str(), L"javaw.exe") == 0)
 				{
 					process.Kill();
 					killJava = false;

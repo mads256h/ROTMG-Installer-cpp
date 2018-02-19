@@ -180,6 +180,7 @@
     <ResourceCompile Include="ROTMG-Installer-cpp.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="icon.ico" />
     <Image Include="ROTMG-Installer-cpp.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
