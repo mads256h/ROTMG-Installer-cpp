@@ -32,7 +32,7 @@ class File {
 public:
 
 	//Deletes the file specified by path.
-	static void Delete(const std::wstring path, const bool ignoreError = false)
+	static void Delete(const std::wstring& path, const bool ignoreError = false)
 	{
 		//Check if the file exists. If it does not and ignoreError is false. Throw a fileNotFoundException.
 		if (Exists(path))
@@ -56,7 +56,7 @@ public:
 	}
 
 	//Check if path is a file and it exists.
-	static bool Exists(const std::wstring path)
+	static bool Exists(const std::wstring& path)
 	{
 		//Opens the file. If it is successful it closes the file again.
 		FILE *file;
@@ -72,7 +72,7 @@ public:
 	}
 
 	//Read the file in path.
-	static std::string Read(const std::wstring path)
+	static std::string Read(const std::wstring& path)
 	{
 		//If the file does not exist. Throw a fileNotFoundException.
 		if (Exists(path))
@@ -90,7 +90,7 @@ public:
 	}
 
 	//Get the MD5 from a file.
-	static std::string MD5Hash(const std::wstring path)
+	static std::string MD5Hash(const std::wstring& path)
 	{
 		//If the does not exist. Throw a fileNotFoundException.
 		if (!Exists(path))

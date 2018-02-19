@@ -12,7 +12,7 @@ class MBox
 {
 public:
 
-	MBox(const std::wstring text)
+	MBox(const std::wstring& text)
 	{
 		dialog = CreateDialog(NULL, MAKEINTRESOURCE(IDD_DIALOG_DOWNLOAD), NULL, NULL);
 		ShowWindow(dialog, SW_SHOW);
@@ -27,7 +27,7 @@ public:
 		dialog = NULL;
 	}
 
-	void SetText(const std::wstring text)
+	void SetText(const std::wstring& text) const
 	{
 		SetDlgItemText(dialog, IDC_STATIC_STATUS, text.c_str());
 	}

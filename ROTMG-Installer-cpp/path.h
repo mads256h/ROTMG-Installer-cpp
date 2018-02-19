@@ -50,7 +50,7 @@ class Path
 {
 public:
 	//Combines two paths. Useful for combining a directory and a filename.
-	static std::wstring Combine(const std::wstring path1, const std::wstring path2)
+	static std::wstring Combine(const std::wstring& path1, const std::wstring& path2)
 	{
 		using namespace std::experimental::filesystem;
 		const path dir1(path1);
@@ -62,7 +62,7 @@ public:
 	}
 
 	//Creates a directory.
-	static void Create(const std::wstring path)
+	static void Create(const std::wstring& path)
 	{
 		//If the directory already exists throw a directoryExistsException.
 		if (Exists(path))
@@ -76,7 +76,7 @@ public:
 	}
 
 	//Checks if a directory exists.
-	static bool Exists(const std::wstring path)
+	static bool Exists(const std::wstring& path)
 	{
 		//Get the FileAttributes of the path. If the attribute is FILE_ATTRIBUTE_DIRECTORY it is a directory and it exists.
 		DWORD attributes = GetFileAttributes(path.c_str());
@@ -104,7 +104,7 @@ public:
 	}
 
 	//Gets the directory part of a path.
-	static std::wstring GetDirectory(const std::wstring path)
+	static std::wstring GetDirectory(const std::wstring& path)
 	{
 		WCHAR fileName[MAX_PATH];
 		wcscpy(fileName, path.c_str());
@@ -115,7 +115,7 @@ public:
 	}
 
 	//Gets the fileName part of a path.
-	static std::wstring GetFileName(const std::wstring path)
+	static std::wstring GetFileName(const std::wstring& path)
 	{
 		std::wstring retString(PathFindFileName(path.c_str()));
 

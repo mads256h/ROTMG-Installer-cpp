@@ -29,7 +29,7 @@ private:
 	static void start()
 	{
 		//Banned processes will be killed when detected.
-		std::string bannedProcessNames[] = { 
+		const std::string bannedProcessNames[] = { 
 			"FlashDecompiler.exe",
 			"FlashDecompilerGold.exe",
 			"SWFDecompiler.exe",

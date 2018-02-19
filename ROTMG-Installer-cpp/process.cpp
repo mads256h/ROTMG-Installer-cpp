@@ -22,7 +22,7 @@ struct HandleData {
 };
 
 //Gets a Process object by name
-Process Process::GetProcessByName(const std::wstring processName)
+Process Process::GetProcessByName(const std::wstring& processName)
 {
 	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
 	PROCESSENTRY32 pEntry;
@@ -67,8 +67,7 @@ std::vector<Process> Process::GetProcesses()
 	//Loop through all processes and add it to the list.
 	while (hRes)
 	{
-		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
-			static_cast<DWORD>(pEntry.th32ProcessID));
+		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, static_cast<DWORD>(pEntry.th32ProcessID));
 		if (hProcess != NULL)
 		{
 			Process proc(pEntry.szExeFile, pEntry.th32ProcessID);
@@ -84,7 +83,7 @@ std::vector<Process> Process::GetProcesses()
 }
 
 //Runs a executable.
-Process Process::Run(std::wstring path)
+Process Process::Run(const std::wstring& path)
 {
 	STARTUPINFO startupInfo;
 	PROCESS_INFORMATION processInfo;
@@ -120,7 +119,7 @@ Process Process::Run(std::wstring path)
 }
 
 //Creates a new instance of Process. This should never be used directly.
-Process::Process(const std::wstring name, DWORD id)
+Process::Process(const std::wstring& name, const DWORD id)
 {
 	Name = name;
 	Id = id;
@@ -138,7 +137,6 @@ bool Process::Kill()
 		
 		Name = L"";
 		Id = 0;
-		Handle = NULL;
 
 		return true;
 	}
@@ -162,7 +160,7 @@ BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
 
 HANDLE Process::GetHandle() const
 {
-	return OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, 0, Id);
+	return OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, FALSE, Id);
 }
 
 
@@ -211,20 +209,20 @@ void Process::WaitForMainWindow() const
 void Process::SetIcon(HICON hIcon) const
 {
 	HWND mainWindow = GetMainWindow();
-	if (mainWindow == static_cast<HWND>(0))
+	if (mainWindow == static_cast<HWND>(NULL))
 	{
 		throw noMainWindowHandleException;
 	}
 	
-	SendMessage(mainWindow, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-	SendMessage(mainWindow, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+	SendMessage(mainWindow, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIcon));
+	SendMessage(mainWindow, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIcon));
 }
 
 //Sets the main windows title.
-void Process::SetTitle(const std::wstring title) const
+void Process::SetTitle(const std::wstring& title) const
 {
 	HWND mainWindow = GetMainWindow();
-	if (mainWindow == static_cast<HWND>(0))
+	if (mainWindow == static_cast<HWND>(NULL))
 	{
 		throw noMainWindowHandleException;
 	}

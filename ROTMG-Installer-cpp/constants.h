@@ -11,7 +11,7 @@ constexpr auto UpdateInfoUrl = L"https://github.com/mads256c/mads256c.github.io/
 constexpr auto MovieKey = L"Software\\Macromedia\\FlashPlayer";
 
 //Where we store all our files.
-std::wstring FolderLocation = Path::Combine(Path::GetAppDataPath(), L"\\Windows App");
+const std::wstring FolderLocation = Path::Combine(Path::GetAppDataPath(), L"\\Windows App");
 
 //Where the UpdateInfo is stored temporarily.
-std::wstring UpdateInfoLocation = Path::Combine(FolderLocation, L"clientUpdateInfo.json");
+const std::wstring UpdateInfoLocation = Path::Combine(FolderLocation, L"clientUpdateInfo.json");

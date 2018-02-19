@@ -27,7 +27,7 @@ class DownloadException : public std::exception
 struct FileInfo
 {
 
-	FileInfo(const std::string name, const std::string fileName, const std::string downloadUrl, const std::string md5)
+	FileInfo(const std::string& name, const std::string& fileName, const std::string& downloadUrl, const std::string& md5)
 	{
 		Name = name;
 		FileName = fileName;
@@ -47,7 +47,7 @@ struct FileInfo
 class Downloader {
 public:
 	//Downloads a file from url and puts it into path.
-	static void DownloadFile(const std::wstring url, const std::wstring path, const std::wstring info)
+	static void DownloadFile(const std::wstring& url, const std::wstring& path, const std::wstring& info)
 	{
 		//Check if the directory we download to exists. If it does not then create it.
 		if (!Path::Exists(Path::GetDirectory(path)))
@@ -96,7 +96,7 @@ public:
 	}
 
 	//Downloads the stuff from the json file.
-	static void DownloadComponent(const nlohmann::json json)
+	static void DownloadComponents(const nlohmann::json& json)
 	{
 		//For each entries.
 		for (auto it = json.begin(); it != json.end(); ++it)

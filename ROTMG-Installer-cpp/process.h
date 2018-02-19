@@ -18,9 +18,9 @@
 class Process
 {
 public:
-	static Process GetProcessByName(std::wstring filename);
+	static Process GetProcessByName(const std::wstring& processName);
 	static std::vector<Process> GetProcesses();
-	static Process Run(std::wstring path);
+	static Process Run(const std::wstring& path);
 	static BOOL IsMainWindow(HWND handle);
 
 	std::wstring Name;
@@ -32,11 +32,11 @@ public:
 	void WaitForExit() const;
 	void WaitForMainWindow() const;
 	void SetIcon(HICON hIcon) const;
-	void SetTitle(std::wstring title) const;
+	void SetTitle(const std::wstring& title) const;
 	void DisableResizing() const;
 
 private:
-	Process(std::wstring name, DWORD id);
+	Process(const std::wstring& name, DWORD id);
 	
 
 };
