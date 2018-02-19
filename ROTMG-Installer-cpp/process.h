@@ -25,20 +25,18 @@ public:
 
 	std::wstring Name;
 	DWORD Id;
-	HANDLE Handle;
 
 	bool Kill();
+	HANDLE GetHandle() const;
 	HWND GetMainWindow() const;
 	void WaitForExit() const;
 	void WaitForMainWindow() const;
 	void SetIcon(HICON hIcon) const;
 	void SetTitle(std::wstring title) const;
 	void DisableResizing() const;
-	
-	~Process();
 
 private:
-	Process(std::wstring name, DWORD id, HANDLE handle);
+	Process(std::wstring name, DWORD id);
 	
 
 };

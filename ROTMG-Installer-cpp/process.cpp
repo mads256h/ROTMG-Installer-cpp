@@ -37,7 +37,8 @@ Process Process::GetProcessByName(const std::wstring processName)
 				static_cast<DWORD>(pEntry.th32ProcessID));
 			if (hProcess != NULL)
 			{
-				Process proc(pEntry.szExeFile, pEntry.th32ProcessID, hProcess);
+				Process proc(pEntry.szExeFile, pEntry.th32ProcessID);
+				CloseHandle(hProcess);
 				CloseHandle(hSnapShot);
 				return proc;
 			}
@@ -48,7 +49,7 @@ Process Process::GetProcessByName(const std::wstring processName)
 
 	//We could not find it return this.
 	//TODO: Throw an exception instead.
-	Process proc(L"", 0, NULL);
+	Process proc(L"", 0);
 
 	return proc;
 
@@ -70,7 +71,8 @@ std::vector<Process> Process::GetProcesses()
 			static_cast<DWORD>(pEntry.th32ProcessID));
 		if (hProcess != NULL)
 		{
-			Process proc(pEntry.szExeFile, pEntry.th32ProcessID, hProcess);
+			Process proc(pEntry.szExeFile, pEntry.th32ProcessID);
+			CloseHandle(hProcess);
 			processes.push_back(proc);
 		}
 		hRes = Process32Next(hSnapShot, &pEntry);
@@ -109,29 +111,26 @@ Process Process::Run(std::wstring path)
 		throw processCouldNotStartException;
 	}
 	//Get the process we just started and return it.
-	Process process(path, processInfo.dwProcessId, processInfo.hProcess);
+	Process process(path, processInfo.dwProcessId);
+
+	CloseHandle(processInfo.hProcess);
+	CloseHandle(processInfo.hThread);
 
 	return process;
 }
 
 //Creates a new instance of Process. This should never be used directly.
-Process::Process(const std::wstring name, DWORD id, HANDLE handle)
+Process::Process(const std::wstring name, DWORD id)
 {
 	Name = name;
 	Id = id;
-	Handle = handle;
-}
-
-Process::~Process()
-{
-	if (Handle != NULL)
-	CloseHandle(Handle);
 }
 
 
 //Kills the process.
 bool Process::Kill()
 {
+	HANDLE Handle = GetHandle();
 	if (Handle != NULL)
 	{
 		TerminateProcess(Handle, 9);
@@ -161,6 +160,13 @@ BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
 	return FALSE;
 }
 
+HANDLE Process::GetHandle() const
+{
+	return OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, 0, Id);
+}
+
+
+
 //Gets the process's main window handle.
 HWND Process::GetMainWindow() const
 {
@@ -174,9 +180,10 @@ HWND Process::GetMainWindow() const
 //Waits until the program exists.
 void Process::WaitForExit() const
 {
+	HANDLE Handle = GetHandle();
 	DWORD exitcode;
 	GetExitCodeProcess(Handle, &exitcode);
-	while (exitcode == STILL_ACTIVE)
+	while (exitcode == STILL_ACTIVE && Handle != NULL)
 	{
 		using namespace std::chrono_literals;
 
@@ -184,6 +191,9 @@ void Process::WaitForExit() const
 
 		GetExitCodeProcess(Handle, &exitcode);
 	}
+
+	if (Handle != NULL)
+	CloseHandle(Handle);
 }
 
 //Waits until the main window is created.
@@ -226,7 +236,7 @@ void Process::SetTitle(const std::wstring title) const
 void Process::DisableResizing() const
 {
 	HWND mainWindow = GetMainWindow();
-	if (mainWindow == static_cast<HWND>(0))
+	if (mainWindow == static_cast<HWND>(NULL))
 	{
 		throw noMainWindowHandleException;
 	}
@@ -241,6 +251,6 @@ void Process::DisableResizing() const
 //Checks if the handle is the main window.
 BOOL Process::IsMainWindow(HWND handle)
 {
-	return GetWindow(handle, GW_OWNER) == static_cast<HWND>(0) && IsWindowVisible(handle);
+	return GetWindow(handle, GW_OWNER) == static_cast<HWND>(NULL) && IsWindowVisible(handle);
 }
 
