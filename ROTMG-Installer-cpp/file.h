@@ -103,7 +103,6 @@ public:
 		return md5hash;
 	}
 
-private:
 	File() = delete;
 };
 

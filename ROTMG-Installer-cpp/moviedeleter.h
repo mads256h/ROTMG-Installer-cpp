@@ -31,6 +31,5 @@ public:
 		RegDeleteValue(hKey, L"RecentMovie9");
 	}
 
-private:
 	MovieDeleter() = delete;
 };

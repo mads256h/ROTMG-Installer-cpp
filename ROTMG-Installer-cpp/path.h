@@ -123,8 +123,6 @@ public:
 	}
 
 
-
-private:
 	Path() = delete;
 };
 

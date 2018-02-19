@@ -22,7 +22,6 @@ public:
 		return str;
 	}
 
-private:
 	Converter() = delete;
 };
 

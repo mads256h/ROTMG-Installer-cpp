@@ -121,7 +121,7 @@ public:
 		}
 	}
 
-private:
+
 	Downloader() = delete;
 };
 

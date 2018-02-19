@@ -21,10 +21,9 @@ public:
 		t.detach();
 	}
 
-
-private:
 	AntiDecompiler() = delete;
 
+private:
 	//The function that is ran inside the thread.
 	static void start()
 	{
