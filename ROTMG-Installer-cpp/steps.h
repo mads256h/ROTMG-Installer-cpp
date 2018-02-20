@@ -14,8 +14,6 @@
 #include "process.h"
 #include "moviedeleter.h"
 
-std::atomic<bool> IsDone = false;
-
 class Steps
 {
 	Steps() = delete;
@@ -29,6 +27,7 @@ public:
 			Path::Create(FolderLocation);
 		}
 
+		
 		//Download the UpdateInfo JSON.
 		Downloader::DownloadFile(UpdateInfoUrl, UpdateInfoLocation, L"Update Info");
 
