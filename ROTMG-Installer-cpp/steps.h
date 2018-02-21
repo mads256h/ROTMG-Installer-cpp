@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <thread>
 
 #include <Windows.h>
 
@@ -16,8 +15,6 @@
 
 class Steps
 {
-	Steps() = delete;
-
 public:
 	static void Run(HINSTANCE hInstance)
 	{
@@ -74,4 +71,6 @@ public:
 		MovieDeleter::DeleteKeys();
 
 	}
+
+	Steps() = delete;
 };
