@@ -2,17 +2,11 @@
 // Microsoft Visual C++ generated include file.
 // Used by ROTMG-Installer-cpp.rc
 //
-#define IDC_MYICON                      2
-#define IDD_ROTMGINSTALLERCPP_DIALOG    102
-#define IDM_ABOUT                       104
 #define IDI_ROTMGINSTALLERCPP           107
 #define IDI_SMALL                       108
-#define IDR_MAINFRAME                   128
-#define IDD_DIALOG                      129
 #define IDD_DIALOG_DOWNLOAD             129
 #define IDC_PROGRESS_PROGRESS           1001
 #define IDC_STATIC_STATUS2              1002
-#define IDC_STATIC                      -1
 #define IDC_STATIC_STATUS               -1
 
 // Next default values for new objects
