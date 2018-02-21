@@ -3,11 +3,9 @@
 
 #include <string>
 
-#include <windows.h>
-#include <urlmon.h>
-#include <WinInet.h>
-#pragma comment(lib, "urlmon.lib")
-#pragma comment(lib,"wininet.lib")
+#include <Windows.h>
+#include <winhttp.h>
+#pragma comment(lib,"winhttp.lib")
 
 #include "file.h"
 #include "path.h"
@@ -15,6 +13,8 @@
 #include "constants.h"
 #include "resource.h"
 #include "mbox.h"
+#include "url.h"
+#include "error.h"
 
 class DownloadException : public std::exception
 {
@@ -46,141 +46,6 @@ struct FileInfo
 
 bool downloading;
 
-class DownloadStatus : public IBindStatusCallback
-{
-public:
-
-
-	STDMETHOD(OnStartBinding)(
-		/* [in] */ DWORD dwReserved,
-		/* [in] */ IBinding __RPC_FAR *pib)
-	{
-		return E_NOTIMPL;
-	}
-
-	STDMETHOD(GetPriority)(
-		/* [out] */ LONG __RPC_FAR *pnPriority)
-	{
-		return E_NOTIMPL;
-	}
-
-	STDMETHOD(OnLowResource)(
-		/* [in] */ DWORD reserved)
-	{
-		return E_NOTIMPL;
-	}
-
-	STDMETHOD(OnProgress)(
-		/* [in] */ ULONG ulProgress,
-		/* [in] */ ULONG ulProgressMax,
-		/* [in] */ ULONG ulStatusCode,
-		/* [in] */ LPCWSTR wszStatusText);
-
-	STDMETHOD(OnStopBinding)(
-		/* [in] */ HRESULT hresult,
-		/* [unique][in] */ LPCWSTR szError)
-	{
-		return E_NOTIMPL;
-	}
-
-	STDMETHOD(GetBindInfo)(
-		/* [out] */ DWORD __RPC_FAR *grfBINDF,
-		/* [unique][out][in] */ BINDINFO __RPC_FAR *pbindinfo);
-
-	STDMETHOD(OnDataAvailable)(
-		/* [in] */ DWORD grfBSCF,
-		/* [in] */ DWORD dwSize,
-		/* [in] */ FORMATETC __RPC_FAR *pformatetc,
-		/* [in] */ STGMEDIUM __RPC_FAR *pstgmed)
-	{
-		return E_NOTIMPL;
-	}
-
-	STDMETHOD(OnObjectAvailable)(
-		/* [in] */ REFIID riid,
-		/* [iid_is][in] */ IUnknown __RPC_FAR *punk)
-	{
-		return E_NOTIMPL;
-	}
-
-	// IUnknown methods.  Note that IE never calls any of these methods, since
-	// the caller owns the IBindStatusCallback interface, so the methods all
-	// return zero/E_NOTIMPL.
-
-	STDMETHOD_(ULONG, AddRef)()
-	{
-		return 0;
-	}
-
-	STDMETHOD_(ULONG, Release)()
-	{
-		return 0;
-	}
-
-	STDMETHOD(QueryInterface)(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
-	{
-		return E_NOTIMPL;
-	}
-};
-
-int progress = 0;
-
-HRESULT DownloadStatus::GetBindInfo(
-	/* [out] */ DWORD __RPC_FAR *grfBINDF,
-	/* [unique][out][in] */ BINDINFO __RPC_FAR *pbindinfo)
-{
-	*grfBINDF = BINDF_NOWRITECACHE | BINDF_PRAGMA_NO_CACHE | BINDF_GETNEWESTVERSION | BINDF_DONTPUTINCACHE | BINDF_DONTUSECACHE;
-
-	return S_OK;
-}
-
-HRESULT DownloadStatus::OnProgress(ULONG ulProgress, ULONG ulProgressMax,
-	ULONG ulStatusCode, LPCWSTR wszStatusText)
-{
-	std::wstringstream ss;
-	ss << ulStatusCode << std::endl;
-
-	OutputDebugString(ss.str().c_str());
-
-	
-	switch (ulStatusCode)
-	{
-
-	case BINDSTATUS_COOKIE_SENT:
-	case BINDSTATUS_CONNECTING:
-		progress = 5;
-		MBox::SetStatus2(L"Connecting...");
-		break;
-
-	case BINDSTATUS_BEGINDOWNLOADDATA:
-		progress = 10;
-		MBox::SetStatus2(L"Downloading...");
-		break;
-
-	case BINDSTATUS_DOWNLOADINGDATA:
-	{
-		if (int prog = ((static_cast<double>(ulProgress) / static_cast<double>(ulProgressMax)) * 100.0) > progress)
-		{
-			progress = prog;
-		}
-		std::wstringstream ss;
-		ss << ulProgress / 1024 << "KB / " << ulProgressMax << "KB";
-		MBox::SetStatus2(ss.str().c_str());
-		break;
-	}
-
-	case BINDSTATUS_ENDDOWNLOADDATA:
-		progress = 100;
-		break;
-	}
-
-	MBox::SetProgress(progress);
-
-	return S_OK;
-}
-
 //Downloads things.
 class Downloader {
 public:
@@ -198,46 +63,124 @@ public:
 		{
 			File::Delete(path);
 		}
+
+		Url url_split(Converter::ToString(url));
+
 		std::wstring str(L"Updating ");
 		str.append(info);
 		str.append(L"...");
 
 		MBox::Create(str, L"Connecting...");
 
-		DownloadStatus ds;
+		const HINTERNET hSession = WinHttpOpen(L"Client Updater", NULL, NULL, NULL, NULL);
 
-		progress = 0;
+		if (!hSession)
+			Error(L"Could not create a WinHttp session.\r\nTry restarting your computer!");
 
-		BOOL b = DeleteUrlCacheEntry(url.c_str());
 
-		DWORD d = GetLastError();
+		const HINTERNET hConnect = WinHttpConnect(hSession, Converter::ToWString(url_split.host_).c_str(), INTERNET_DEFAULT_HTTPS_PORT, NULL);
 
-		//Try to download the file. Get the error code in hResult.
-		HRESULT hResult = URLDownloadToFile(NULL, url.c_str(), path.c_str(), 0, &ds);
+		if (!hConnect)
+			Error(L"Could not connect to the server.\r\nCheck your internet connection.");
+
+
+		const HINTERNET hRequest = WinHttpOpenRequest(hConnect, L"GET", Converter::ToWString(url_split.path_).c_str(), NULL, NULL, NULL, WINHTTP_FLAG_SECURE);
+
+		if (!hRequest)
+			Error(L"Could not connect to the server.\r\nCheck your internet connection.");
+
+
+		MBox::SetStatus2(L"Sending request...");
+
+		BOOL bResult = WinHttpSendRequest(hRequest, NULL, 0, NULL, NULL, NULL, NULL);
+
+		if (!bResult)
+			Error(L"Could not send the request.\r\nCheck your internet connection.");
+
+
+		MBox::SetStatus2(L"Waiting on response...");
+
+		bResult = WinHttpReceiveResponse(hRequest, NULL);
+
+		if (!bResult)
+			Error(L"Could not recieve a response.\r\nCheck your internet connection.");
+
+
+		MBox::SetStatus2(L"Downloading...");
+
+		FILE* pFile;
+		if (fopen_s(&pFile, Converter::ToString(path).c_str(), "w+b") != 0)
+		{
+			Error(L"Could not open the file stream.");
+		}
+
+		DWORD dwSize;
+		DWORD dwDownloaded = 0;
+		LPSTR pszOutBuffer;
+		do
+		{
+			dwSize = 0;
+
+			if (!WinHttpQueryDataAvailable(hRequest, &dwSize))
+			{
+				switch (GetLastError())
+				{
+				case ERROR_WINHTTP_CONNECTION_ERROR:
+				case ERROR_WINHTTP_TIMEOUT:
+					Error(L"A connection error occured.\r\nCheck your internet connection.");
+					break;
+
+				default:
+					Error(L"An unknown download error occured.\r\nCheck your internet connection or try restarting your computer.");
+				}
+			}
+
+			pszOutBuffer = new CHAR[dwSize + 1];
+
+			ZeroMemory(pszOutBuffer, dwSize + 1);
+
+			if (!WinHttpReadData(hRequest, static_cast<LPVOID>(pszOutBuffer), dwSize, &dwDownloaded))
+			{
+				switch (GetLastError())
+				{
+				case ERROR_WINHTTP_CONNECTION_ERROR:
+				case ERROR_WINHTTP_TIMEOUT:
+					Error(L"A connection error occured.\r\nCheck your internet connection.");
+					break;
+
+				default:
+					Error(L"An unknown download error occured.\r\nCheck your internet connection or try restarting your computer.");
+				}
+			}
+			else
+			{
+				if (dwSize != 0)
+				{
+					if (dwDownloaded == 0)
+					{
+						MBox::SetProgress(0);
+					}
+					else
+					{
+						const int prog = static_cast<double>(dwDownloaded) / static_cast<double>(dwSize) * 100.0;
+						MBox::SetProgress(prog);
+
+					}
+
+					
+				}
+				fwrite(pszOutBuffer, static_cast<size_t>(dwDownloaded), static_cast<size_t>(1), pFile);
+			}
+
+
+		}
+		while (dwSize > 0);
+
+		delete[] pszOutBuffer;
+
+		fclose(pFile);
 
 		MBox::Destroy();
-
-		//Checks if there is an error.
-		switch (hResult)
-		{
-		case S_OK:
-			if (!File::Exists(path))
-			{
-				throw downloadException;
-			}
-			return;
-
-		case INET_E_CANNOT_CONNECT:
-		case INET_E_CONNECTION_TIMEOUT:
-		case INET_E_DOWNLOAD_FAILURE:
-		case INET_E_RESOURCE_NOT_FOUND:
-			MessageBox(NULL, L"Could not connect to the server.\r\nMake sure your internet connection is working.", L"Download Error", MB_OK);
-			exit(1);
-			break;
-
-		default:
-			throw downloadException;
-		}
 
 	}
 
