@@ -24,6 +24,25 @@ public:
 			Path::Create(FolderLocation);
 		}
 
+		if (File::Exists(TrustedFile))
+		{
+			File::Delete(TrustedFile);
+		}
+
+		std::ofstream trustedFileStream(TrustedFile);
+
+		if (trustedFileStream.is_open())
+		{
+			trustedFileStream << Converter::ToString(FolderLocation);
+			
+			trustedFileStream.close();
+		}
+		else
+		{
+			Error(L"Could not write trusted file.\r\nPlease close all flashplayer instances and try again.");
+		}
+
+
 		
 		//Download the UpdateInfo JSON.
 		Downloader::DownloadFile(UpdateInfoUrl, UpdateInfoLocation, L"Update Info");
