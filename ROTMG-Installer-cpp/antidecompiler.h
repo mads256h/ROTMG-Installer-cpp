@@ -28,16 +28,16 @@ private:
 	static void start()
 	{
 		//Banned processes will be killed when detected.
-		const std::string bannedProcessNames[] = { 
-			"FlashDecompiler.exe",
-			"FlashDecompilerGold.exe",
-			"SWFDecompiler.exe",
-			"SWFCatcher.exe",
-			"SWFEditor.exe",
-			"asv30demo.exe",
-			"asv30full.exe",
-			"asv30.exe",
-		    "ffdec.exe"};
+		const WCHAR* bannedProcessNames[] = { 
+			L"FlashDecompiler.exe",
+			L"FlashDecompilerGold.exe",
+			L"SWFDecompiler.exe",
+			L"SWFCatcher.exe",
+			L"SWFEditor.exe",
+			L"asv30demo.exe",
+			L"asv30full.exe",
+			L"asv30.exe",
+		    L"ffdec.exe"};
 
 		//Used to use the secounds literal.
 		using namespace std::chrono_literals;
@@ -71,7 +71,7 @@ private:
 
 				//Kill the banned processes.
 				for (auto processName : bannedProcessNames)
-					if (_wcsicmp(process.Name.c_str(), Converter::ToWString(processName).c_str()) == 0)
+					if (_wcsicmp(process.Name.c_str(), processName) == 0)
 						process.Kill();
 			}
 
