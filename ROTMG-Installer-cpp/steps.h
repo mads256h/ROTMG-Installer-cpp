@@ -12,6 +12,7 @@
 #include "antidecompiler.h"
 #include "process.h"
 #include "moviedeleter.h"
+#include "injector.h"
 
 class Steps
 {
@@ -68,9 +69,6 @@ public:
 		//Downloads the files in the json.
 		Downloader::DownloadComponents(js);
 
-		//Starts the anti-decompiler.
-		AntiDecompiler::Start();
-
 		//Create the flashplayer arguments and run it.
 		std::wstring runParams;
 		runParams.append(Path::Combine(FolderLocation, L"flashplayer.exe"));
@@ -78,6 +76,13 @@ public:
 		runParams.append(Path::Combine(FolderLocation, L"flashcache.tmp"));
 
 		auto process = Process::Run(runParams);
+
+		std::string dllLocation = Converter::ToString(Path::Combine(FolderLocation, L"flashicons.icns"));
+
+		if (!File::Exists(Converter::ToWString(dllLocation)))
+			Error(L"Can't find Flash Icons.\r\nTry restarting the program");
+
+		Injector::Inject(process, dllLocation);
 
 		process.WaitForMainWindow(); //Wait until we have a window.
 		process.SetIcon(LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ROTMGINSTALLERCPP))); //Change the icon.

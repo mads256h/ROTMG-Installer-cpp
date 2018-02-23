@@ -45,9 +45,6 @@
     <ClInclude Include="json.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="antidecompiler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -67,6 +64,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="injector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

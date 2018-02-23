@@ -134,7 +134,7 @@ bool Process::Kill()
 	{
 		TerminateProcess(Handle, 9);
 		CloseHandle(Handle);
-		
+
 		Name = L"";
 		Id = 0;
 
@@ -191,7 +191,7 @@ void Process::WaitForExit() const
 	}
 
 	if (Handle != NULL)
-	CloseHandle(Handle);
+		CloseHandle(Handle);
 }
 
 //Waits until the main window is created.
@@ -213,7 +213,7 @@ void Process::SetIcon(HICON hIcon) const
 	{
 		throw noMainWindowHandleException;
 	}
-	
+
 	SendMessage(mainWindow, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIcon));
 	SendMessage(mainWindow, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIcon));
 }
@@ -251,4 +251,3 @@ BOOL Process::IsMainWindow(HWND handle)
 {
 	return GetWindow(handle, GW_OWNER) == static_cast<HWND>(NULL) && IsWindowVisible(handle);
 }
-
