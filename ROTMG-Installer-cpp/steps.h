@@ -25,6 +25,11 @@ public:
 			Path::Create(FolderLocation);
 		}
 
+		if (!Path::Exists(TrustedFolderLocation))
+		{
+			Path::Create(TrustedFolderLocation);
+		}
+
 		if (File::Exists(TrustedFile))
 		{
 			File::Delete(TrustedFile);

@@ -68,8 +68,7 @@ public:
 		if (Exists(path))
 			throw directoryExistsException;
 
-		//Create the directory. If it returns false throw a winApiException.
-		if (CreateDirectory(path.c_str(), NULL) == FALSE)
+		if (SHCreateDirectoryEx(NULL, path.c_str(), NULL) != 0)
 		{
 			throw winApiException;
 		}

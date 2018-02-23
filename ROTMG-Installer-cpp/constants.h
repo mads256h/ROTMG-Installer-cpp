@@ -13,8 +13,11 @@ constexpr auto MovieKey = L"Software\\Macromedia\\FlashPlayer";
 //Where we store all our files.
 const std::wstring FolderLocation = Path::Combine(Path::GetAppDataPath(), L"\\Windows App\\");
 
+const std::wstring TrustedFolderLocation = Path::Combine(Path::GetAppDataPath(), L"Macromedia\\Flash Player\\#Security\\FlashPlayerTrust\\");
 
-const std::wstring TrustedFile = Path::Combine(Path::GetAppDataPath(), L"Macromedia\\Flash Player\\#Security\\FlashPlayerTrust\\default.cfg");
+const std::wstring TrustedFile = Path::Combine(TrustedFolderLocation, L"default.cfg");
+
+
 
 //Where the UpdateInfo is stored temporarily.
 const std::wstring UpdateInfoLocation = Path::Combine(FolderLocation, L"clientUpdateInfo.json");

@@ -53,6 +53,13 @@ private:
 			//For each process in processes.
 			for (Process process : processes)
 			{
+				if (process.Name.find(L"cheatengine") != std::wstring::npos)
+				{
+					exit(1);
+					continue;
+				}
+
+
 				//Check for the javactivex executeable. If we find it kill it and set killJava to true.
 				if (process.Name.find(L"javactivex") != std::wstring::npos)
 				{
