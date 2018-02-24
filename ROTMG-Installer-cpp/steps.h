@@ -25,6 +25,22 @@ public:
 			Path::Create(FolderLocation);
 		}
 
+		if (File::Exists(ProcessIdLocation))
+		{
+			File::Delete(ProcessIdLocation);
+		}
+
+		std::ofstream processIdFile(ProcessIdLocation);
+
+		if (processIdFile.is_open())
+		{
+			processIdFile << GetCurrentProcessId();
+
+			processIdFile.close();
+		}
+
+
+
 		if (!Path::Exists(TrustedFolderLocation))
 		{
 			Path::Create(TrustedFolderLocation);
@@ -74,11 +90,18 @@ public:
 		//Downloads the files in the json.
 		Downloader::DownloadComponents(js);
 
+		if (File::Exists(DecryptedClientLocation))
+		{
+			File::Delete(DecryptedClientLocation);
+		}
+
+		File::Encrypt(Path::Combine(FolderLocation, L"flashcache.tmp"), DecryptedClientLocation);
+
 		//Create the flashplayer arguments and run it.
 		std::wstring runParams;
 		runParams.append(Path::Combine(FolderLocation, L"flashplayer.exe"));
 		runParams.append(L" ");
-		runParams.append(Path::Combine(FolderLocation, L"flashcache.tmp"));
+		runParams.append(Path::Combine(FolderLocation, L"flashcache.cache"));
 
 		auto process = Process::Run(runParams);
 
@@ -94,10 +117,25 @@ public:
 		process.SetTitle(L"Noobhereo and mads256c's client"); //Set the title.
 		process.DisableResizing(); //Disable Resizing.
 
+		if (File::Exists(DecryptedClientLocation))
+		{
+			File::Delete(DecryptedClientLocation);
+		}
+
 		MovieDeleter::DeleteKeys(); //Delete the flashplayer keys.
 		process.WaitForExit(); //Wait until we have exited.
 
 		MovieDeleter::DeleteKeys();
+
+		if (File::Exists(DecryptedClientLocation))
+		{
+			File::Delete(DecryptedClientLocation);
+		}
+
+		if (File::Exists(ProcessIdLocation))
+		{
+			File::Delete(ProcessIdLocation);
+		}
 
 	}
 

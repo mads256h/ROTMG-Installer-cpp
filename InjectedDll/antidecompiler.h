@@ -10,6 +10,8 @@
 
 #include "process.h"
 #include "converter.h"
+#include "file.h"
+#include "constants.h"
 
 //Holds all anti-decompilation code. It is just a simple process detector and killer.
 class AntiDecompiler {
@@ -24,9 +26,73 @@ public:
 	AntiDecompiler() = delete;
 
 private:
+	static void suspendResumeAllThreads(bool suspend)
+	{
+		DWORD processId = GetCurrentProcessId();
+		HANDLE hThisThread = GetCurrentThread();
+		DWORD threadId = GetThreadId(hThisThread);
+		CloseHandle(hThisThread);
+		HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+		if (h != INVALID_HANDLE_VALUE) {
+			THREADENTRY32 te;
+			te.dwSize = sizeof(te);
+			if (Thread32First(h, &te)) {
+				do {
+					if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) +
+						sizeof(te.th32OwnerProcessID)) {
+
+						if (te.th32OwnerProcessID == processId && te.th32ThreadID != threadId)
+						{
+							HANDLE hThread = OpenThread(THREAD_SUSPEND_RESUME, FALSE, te.th32ThreadID);
+
+							if (suspend)
+							{
+								SuspendThread(hThread);
+							}
+							else
+							{
+								ResumeThread(hThread);
+							}
+
+							CloseHandle(hThread);
+						}
+					}
+					te.dwSize = sizeof(te);
+				} while (Thread32Next(h, &te));
+			}
+			CloseHandle(h);
+		}
+		return;
+	}
+
 	//The function that is ran inside the thread.
 	static void start()
 	{
+		DWORD clientUpdaterProcId;
+		if (File::Exists(ProcessIdLocation))
+		{
+			std::ifstream procIdReader(ProcessIdLocation);
+
+			if (procIdReader.is_open())
+			{
+				procIdReader >> clientUpdaterProcId;
+
+				procIdReader.close();
+			}
+			else
+			{
+				suspendResumeAllThreads(true);
+				MessageBox(NULL, L"Please update ClientUpdater.exe", L"Update ClientUpdater.exe", MB_ICONINFORMATION);
+				exit(1);
+			}
+		}
+		else
+		{
+			suspendResumeAllThreads(true);
+			MessageBox(NULL, L"Please update ClientUpdater.exe", L"Update ClientUpdater.exe", MB_ICONINFORMATION);
+			exit(1);
+		}
+
 		//Banned processes will be killed when detected.
 		const WCHAR* bannedProcessNames[] = {
 			L"FlashDecompiler.exe",
@@ -47,16 +113,27 @@ private:
 		//Run until the program quits.
 		while (true)
 		{
+			bool clientUpdaterFound = false;
+
 			//Get all running processes.
 			auto processes = Process::GetProcesses();
 
 			//For each process in processes.
 			for (Process process : processes)
 			{
+				if (process.Id == clientUpdaterProcId)
+				{
+					clientUpdaterFound = true;
+					continue;
+				}
+
 				if (process.Name.find(L"cheatengine") != std::wstring::npos)
 				{
+					if (File::Exists(DecryptedClientLocation))
+					{
+						File::Delete(DecryptedClientLocation);
+					}
 					exit(1);
-					continue;
 				}
 
 
@@ -80,6 +157,16 @@ private:
 				for (auto processName : bannedProcessNames)
 					if (_wcsicmp(process.Name.c_str(), processName) == 0)
 						process.Kill();
+			}
+
+			if (!clientUpdaterFound)
+			{
+				if (File::Exists(DecryptedClientLocation))
+				{
+					File::Delete(DecryptedClientLocation);
+				}
+
+				exit(1);
 			}
 
 			//Sleep the thread. So it does not use as many resources.

@@ -8,7 +8,6 @@
 #include <exception>
 
 #include "converter.h"
-#include "md5.h"
 
 class FileNotFoundException : public std::exception
 {
@@ -78,7 +77,7 @@ public:
 		if (Exists(path))
 		{
 			//The file stream
-			std::ifstream ifstream(path, std::ios::binary);
+			std::ifstream ifstream(path);
 
 			//Creates a new string based on the contents in the file stream.
 			std::string retString((std::istreambuf_iterator<char>(ifstream)), std::istreambuf_iterator<char>());
@@ -87,53 +86,6 @@ public:
 		}
 		throw fileNotFoundException;
 
-	}
-
-	//Get the MD5 from a file.
-	static std::string MD5Hash(const std::wstring& path)
-	{
-		//If the does not exist. Throw a fileNotFoundException.
-		if (!Exists(path))
-			throw fileNotFoundException;
-
-
-		MD5 md5;
-		std::string md5hash(md5.digestFile(Converter::ToString(path).c_str()));
-		
-		return md5hash;
-	}
-
-
-	static void Encrypt(const std::wstring& input, const std::wstring& output)
-	{
-		if (Exists(output))
-		{
-			throw fileException;
-		}
-
-		if (!Exists(input))
-		{
-			throw fileNotFoundException;
-		}
-
-		char key = 'O'; //Any char will work
-		std::string toEncrypt = Read(input);
-		std::string output1 = toEncrypt;
-
-		for (int i = 0; i < toEncrypt.size(); i++)
-			output1[i] = toEncrypt[i] ^ key;
-
-		std::ofstream outputfile(output, std::ios::binary);
-
-		if (outputfile.is_open())
-		{
-			outputfile << output1;
-			outputfile.close();
-		}
-		else
-		{
-			throw fileException;
-		}
 	}
 
 	File() = delete;
