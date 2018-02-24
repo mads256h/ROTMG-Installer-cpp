@@ -78,7 +78,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,11,0,0
+ FILEVERSION 1,12,0,0
  PRODUCTVERSION 1,11,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -96,7 +96,7 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Noobhereo & mads256c"
             VALUE "FileDescription", "Client Updater"
-            VALUE "FileVersion", "v1.11"
+            VALUE "FileVersion", "v1.12"
             VALUE "InternalName", "ClientUpdater.exe"
             VALUE "LegalCopyright", "Copyright (C) 2018"
             VALUE "OriginalFilename", "ClientUpdater.exe"
