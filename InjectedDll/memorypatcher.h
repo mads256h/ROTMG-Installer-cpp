@@ -1,6 +1,4 @@
 #pragma once
-#include <ostream>
-#include <iostream>
 #include <Windows.h>
 
 void MemoryPatcher()
@@ -57,8 +55,6 @@ void MemoryPatcher()
 				if (buffer == 'S')
 				{
 					WriteProcessMemory(hProcess, (void*)possibleAddr, overwrite, sizeof(overwrite), NULL);
-					std::cout << GetLastError() << std::endl;
-					std::cout << "Overwrote this: " << std::hex << possibleAddr << std::dec << std::endl;
 					state = 0;
 				}
 				state = 0;
