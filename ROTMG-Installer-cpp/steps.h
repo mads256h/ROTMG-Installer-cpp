@@ -114,7 +114,7 @@ public:
 
 		process.WaitForMainWindow(); //Wait until we have a window.
 		process.SetIcon(LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ROTMGINSTALLERCPP))); //Change the icon.
-		process.SetTitle(L"Noobhereo and mads256c's client"); //Set the title.
+		process.SetTitle(L"Odiom Client"); //Set the title.
 		process.DisableResizing(); //Disable Resizing.
 
 		if (File::Exists(DecryptedClientLocation))

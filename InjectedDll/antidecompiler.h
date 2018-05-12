@@ -103,7 +103,8 @@ private:
 			L"asv30demo.exe",
 			L"asv30full.exe",
 			L"asv30.exe",
-			L"ffdec.exe" };
+			L"ffdec.exe",
+			L"Wireshark.exe"};
 
 		//Used to use the secounds literal.
 		using namespace std::chrono_literals;

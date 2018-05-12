@@ -77,6 +77,12 @@ public:
 		if (!hSession)
 			Error(L"Could not create a WinHttp session.\r\nTry restarting your computer!");
 
+		DWORD options = WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2;
+
+		BOOL bResult = WinHttpSetOption(hSession, WINHTTP_OPTION_SECURE_PROTOCOLS, &options, sizeof(options));
+
+		if (!bResult)
+			Error(L"Could not set options.");
 
 		const HINTERNET hConnect = WinHttpConnect(hSession, Converter::ToWString(url_split.host_).c_str(), INTERNET_DEFAULT_HTTPS_PORT, NULL);
 
@@ -90,12 +96,20 @@ public:
 			Error(L"Could not connect to the server.\r\nCheck your internet connection.");
 
 
+		
+
 		MBox::SetStatus2(L"Sending request...");
 
-		BOOL bResult = WinHttpSendRequest(hRequest, NULL, 0, NULL, NULL, NULL, NULL);
+		bResult = WinHttpSendRequest(hRequest, NULL, 0, NULL, NULL, NULL, NULL);
 
 		if (!bResult)
-			Error(L"Could not send the request.\r\nCheck your internet connection.");
+		{
+			std::wstringstream ss;
+			ss << L"Could not send the request.\r\nCheck your internet connection.\r\nError code: ";
+			ss << GetLastError();
+
+			Error(ss.str());
+		}
 
 
 		MBox::SetStatus2(L"Waiting on response...");
