@@ -120,7 +120,7 @@ public:
 		std::string toEncrypt = Read(input);
 		std::string output1 = toEncrypt;
 
-		for (int i = 0; i < toEncrypt.size(); i++)
+		for (size_t i = 0; i < toEncrypt.size(); i++)
 			output1[i] = toEncrypt[i] ^ key;
 
 		std::ofstream outputfile(output, std::ios::binary);
