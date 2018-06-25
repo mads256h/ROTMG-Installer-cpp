@@ -104,11 +104,7 @@ public:
 
 		if (!bResult)
 		{
-			std::wstringstream ss;
-			ss << L"Could not send the request.\r\nCheck your internet connection.\r\nError code: ";
-			ss << GetLastError();
-
-			Error(ss.str());
+			Error(L"Could not send the request.\r\nCheck your internet connection.");
 		}
 
 

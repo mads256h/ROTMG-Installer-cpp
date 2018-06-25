@@ -54,7 +54,7 @@ void MemoryPatcher()
 			case 2:
 				if (buffer == 'S')
 				{
-					WriteProcessMemory(hProcess, (void*)possibleAddr, overwrite, sizeof(overwrite), NULL);
+					WriteProcessMemory(hProcess, reinterpret_cast<void*>(possibleAddr), overwrite, sizeof(overwrite), NULL);
 					state = 0;
 				}
 				state = 0;
