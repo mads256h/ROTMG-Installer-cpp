@@ -1,5 +1,4 @@
-#ifndef CONVERTER_H
-#define CONVERTER_H
+#pragma once
 
 #include <string>
 
@@ -24,5 +23,3 @@ public:
 
 	Converter() = delete;
 };
-
-#endif // CONVERTER_H

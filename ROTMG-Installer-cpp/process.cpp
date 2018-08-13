@@ -266,6 +266,12 @@ void Process::DisableResizing() const
 	DeleteMenu(hSysmenu, SC_MAXIMIZE, MF_BYCOMMAND);
 	DeleteMenu(hSysmenu, SC_SIZE, MF_BYCOMMAND);
 
+	auto style = GetWindowLong(mainWindow, GWL_STYLE);
+
+	style &= ~(WS_SIZEBOX | WS_MAXIMIZEBOX);
+
+	SetWindowLong(mainWindow, GWL_STYLE, style);
+
 }
 
 //Checks if the handle is the main window.
