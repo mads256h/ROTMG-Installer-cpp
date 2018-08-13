@@ -1,5 +1,4 @@
-#ifndef DOWNLOADER_H
-#define DOWNLOADER_H
+#pragma once
 
 #include <string>
 
@@ -22,7 +21,7 @@ class DownloadException : public std::exception
 	{
 		return "There was an error while downloading!";
 	}
-} downloadException;
+};
 
 //Where we store the information from the JSON UpdateInfo file.
 struct FileInfo
@@ -223,5 +222,3 @@ public:
 
 	Downloader() = delete;
 };
-
-#endif // DOWNLOADER_H
