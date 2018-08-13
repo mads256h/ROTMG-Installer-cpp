@@ -1,5 +1,4 @@
-#ifndef PATH_H
-#define PATH_H
+#pragma once
 
 #include <string>
 #include <exception>
@@ -19,7 +18,7 @@ class WinApiException : public std::exception
 	{
 		return "Something in the WinApi went wrong!";
 	}
-} winApiException;
+};
 
 class PathTooLongException : public std::exception
 {
@@ -27,7 +26,7 @@ class PathTooLongException : public std::exception
 	{
 		return "The path is too long!";
 	}
-} pathTooLongException;
+};
 
 class PathIsNotADirectoryException : public std::exception
 {
@@ -35,7 +34,7 @@ class PathIsNotADirectoryException : public std::exception
 	{
 		return "The path is not a directory!";
 	}
-} pathIsNotADirectoryException;
+};
 
 class DirectoryExistsException : public std::exception
 {
@@ -43,7 +42,7 @@ class DirectoryExistsException : public std::exception
 	{
 		return "The directory exists!";
 	}
-} directoryExistsException;
+};
 
 //This class has to do with directories and paths.
 class Path
@@ -66,11 +65,11 @@ public:
 	{
 		//If the directory already exists throw a directoryExistsException.
 		if (Exists(path))
-			throw directoryExistsException;
+			throw DirectoryExistsException();
 
 		if (SHCreateDirectoryEx(NULL, path.c_str(), NULL) != 0)
 		{
-			throw winApiException;
+			throw WinApiException();
 		}
 	}
 
@@ -95,7 +94,7 @@ public:
 		TCHAR szPath[MAX_PATH];
 		if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, szPath)))
 		{
-			throw winApiException;
+			throw WinApiException();
 		}
 
 		std::wstring appDataPath(szPath);
@@ -124,5 +123,3 @@ public:
 
 	Path() = delete;
 };
-
-#endif // PATH_H

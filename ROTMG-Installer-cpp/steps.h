@@ -99,9 +99,11 @@ public:
 
 		//Create the flashplayer arguments and run it.
 		std::wstring runParams;
+		runParams.append(L"\"");
 		runParams.append(Path::Combine(FolderLocation, L"flashplayer.exe"));
-		runParams.append(L" ");
+		runParams.append(L"\" \"");
 		runParams.append(Path::Combine(FolderLocation, L"flashcache.cache"));
+		runParams.append(L"\"");
 
 		auto process = Process::Run(runParams);
 

@@ -1,4 +1,8 @@
 #include "process.h"
+#include <sstream>
+#include "moviedeleter.h"
+#include "file.h"
+#include "constants.h"
 
 class ProcessCouldNotStartException : public std::exception
 {
@@ -107,6 +111,24 @@ Process Process::Run(const std::wstring& path)
 		&startupInfo,
 		&processInfo) == FALSE)
 	{
+		MovieDeleter::DeleteKeys();
+
+		if (File::Exists(DecryptedClientLocation))
+		{
+			File::Delete(DecryptedClientLocation);
+		}
+
+		if (File::Exists(ProcessIdLocation))
+		{
+			File::Delete(ProcessIdLocation);
+		}
+
+		std::stringstream ss;
+		ss << "Process could not start!\r\n";
+		ss << "Error code: ";
+		ss << GetLastError();
+		
+		MessageBoxA(NULL, ss.str().c_str(), "Process could not start!", MB_ICONERROR);
 		throw processCouldNotStartException;
 	}
 	//Get the process we just started and return it.

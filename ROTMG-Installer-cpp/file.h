@@ -1,5 +1,4 @@
-#ifndef FILE_H
-#define FILE_H
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -16,7 +15,7 @@ class FileNotFoundException : public std::exception
 	{
 		return "The file was not found!";
 	}
-} fileNotFoundException;
+};
 
 class FileException : public std::exception
 {
@@ -24,7 +23,7 @@ class FileException : public std::exception
 	{
 		return "There was an error processing the file!";
 	}
-} fileException;
+};
 
 
 //A static class for use with files.
@@ -40,18 +39,18 @@ public:
 			//If we cannot delete the file and ignoreError is false. Throw a fileException.
 			if (DeleteFile(path.c_str()) == FALSE && !ignoreError)
 			{
-				throw fileException;
+				throw FileException();
 			}
 
 			//If the file still exists after deletion. Throw a fileException.
 			if (Exists(path))
 			{
-				throw fileException;
+				throw FileException();
 			}
 		}
 		else if (!ignoreError)
 		{
-			throw fileNotFoundException;
+			throw FileNotFoundException();
 		}
 	}
 
@@ -85,7 +84,7 @@ public:
 
 			return retString;
 		}
-		throw fileNotFoundException;
+		throw FileNotFoundException();
 
 	}
 
@@ -94,7 +93,7 @@ public:
 	{
 		//If the does not exist. Throw a fileNotFoundException.
 		if (!Exists(path))
-			throw fileNotFoundException;
+			throw FileNotFoundException();
 
 
 		MD5 md5;
@@ -108,12 +107,12 @@ public:
 	{
 		if (Exists(output))
 		{
-			throw fileException;
+			throw FileException();
 		}
 
 		if (!Exists(input))
 		{
-			throw fileNotFoundException;
+			throw FileNotFoundException();
 		}
 
 		char key = 'O'; //Any char will work
@@ -132,11 +131,10 @@ public:
 		}
 		else
 		{
-			throw fileException;
+			throw FileException();
 		}
 	}
 
 	File() = delete;
 };
 
-#endif // FILE_H
